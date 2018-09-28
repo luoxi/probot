@@ -1,6 +1,5 @@
 import Webhooks, { WebhookEvent } from '@octokit/webhooks'
 import Logger from 'bunyan'
-import cacheManager from 'cache-manager'
 import express from 'express'
 import { Application } from './application'
 import { Context } from './context'
@@ -9,15 +8,13 @@ import { logger } from './logger'
 import { resolve } from './resolver'
 import { createServer } from './server'
 import { createWebhookProxy } from './webhook-proxy'
+import { createDefaultCache } from './cache'
 
 // tslint:disable:no-var-requires
 // These needs types
 const logRequestErrors = require('./middleware/log-request-errors')
 
-const cache = cacheManager.caching({
-  store: 'memory',
-  ttl: 60 * 60 // 1 hour
-})
+const cache = createDefaultCache()
 
 const defaultAppFns: ApplicationFunction[] = [
   require('./apps/default'),

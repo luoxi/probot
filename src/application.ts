@@ -6,6 +6,7 @@ import { Context } from './context'
 import { GitHubAPI } from './github'
 import { logger } from './logger'
 import { LoggerWithTarget, wrapLogger } from './wrap-logger'
+import { Cache, Options } from './cache'
 
 // Some events can't get an authenticated client (#382):
 function isUnauthenticatedEvent (event: WebhookEvent) {
@@ -209,19 +210,4 @@ export class Application {
 
     return github
   }
-}
-
-// The TypeScript definition for cache-manager does not export the Cache interface so we recreate it here
-export interface Cache {
-  wrap<T> (key: string, wrapper: (callback: (error: any, result: T) => void) => any, options: CacheConfig): Promise<any>
-}
-export interface CacheConfig {
-  ttl: number
-}
-
-export interface Options {
-  app: () => string
-  cache: Cache
-  router?: express.Router
-  catchErrors?: boolean
 }
