@@ -1,8 +1,9 @@
 import { Application } from './application'
 import { createDefaultCache } from './cache'
 import { GitHubAPI } from './github'
+import { WebhookEvent } from '@octokit/webhooks';
+import { LoggerWithTarget } from './wrap-logger';
 
-const payload = require('/github/workflow/event.json')
 
 export class ActionApplication extends Application {
   private githubToken: string
@@ -10,6 +11,7 @@ export class ActionApplication extends Application {
   constructor() {
     super({ app: () => '', cache: createDefaultCache() })
     const { GITHUB_EVENT, GITHUB_TOKEN } = process.env
+    const payload = require('/github/workflow/event.json')
 
     if (!GITHUB_EVENT) {
       throw new Error('Missing GITHUB_EVENT env variable')
@@ -45,6 +47,10 @@ export class ActionApplication extends Application {
     github.authenticate({ type: 'token', token: this.githubToken })
 
     return github
+  }
+
+  protected authenticateEvent (event: WebhookEvent, log: LoggerWithTarget): Promise<GitHubAPI> {
+    return this.auth()
   }
 
 }

@@ -131,15 +131,7 @@ export class Application {
         const log = this.log.child({ name: 'event', id: event.id })
 
         try {
-          let github
-
-          if (isUnauthenticatedEvent(event)) {
-            github = await this.auth()
-            log.debug('`context.github` is unauthenticated. See https://probot.github.io/docs/github-api/#unauthenticated-events')
-          } else {
-            github = await this.auth(event.payload.installation!.id, log)
-          }
-
+          const github = await this.authenticateEvent(event, log)
           const context = new Context(event, github, log)
 
           await callback(context)
@@ -153,6 +145,15 @@ export class Application {
     } else {
       eventName.forEach(e => this.on(e, callback))
     }
+  }
+
+  protected authenticateEvent (event: WebhookEvent, log: LoggerWithTarget): Promise<GitHubAPI> {
+    if (isUnauthenticatedEvent(event)) {
+      log.debug('`context.github` is unauthenticated. See https://probot.github.io/docs/github-api/#unauthenticated-events')
+      return this.auth()
+    }
+
+    return this.auth(event.payload.installation!.id, log)
   }
 
   /**
