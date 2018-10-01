@@ -1,15 +1,14 @@
+import { WebhookEvent } from '@octokit/webhooks'
+import uuid from 'uuid'
 import { Application } from './application'
 import { createDefaultCache } from './cache'
 import { GitHubAPI } from './github'
-import { WebhookEvent } from '@octokit/webhooks';
-import { LoggerWithTarget } from './wrap-logger';
-import uuid from 'uuid'
-
+import { LoggerWithTarget } from './wrap-logger'
 
 export class ActionApplication extends Application {
   private githubToken: string
 
-  constructor() {
+  constructor () {
     super({ app: () => '', cache: createDefaultCache() })
     const { GITHUB_EVENT, GITHUB_TOKEN } = process.env
     const payload = require('/github/workflow/event.json')
@@ -21,7 +20,7 @@ export class ActionApplication extends Application {
     if (!GITHUB_TOKEN) {
       throw new Error('Missing GITHUB_TOKEN env variable')
     }
-    this.githubToken = GITHUB_TOKEN;
+    this.githubToken = GITHUB_TOKEN
 
     const appPath = process.argv[2] || '.'
     this.load(require(appPath))
@@ -33,7 +32,7 @@ export class ActionApplication extends Application {
     }
 
     this.log.trace(event, 'Event received')
-    this.receive(event).catch((err: any) => {
+    this.receive(event).catch((err: any) => { // tslint:disable-line
       // Process must exist non-zero to indicate that the action failed to run
       process.exit(1)
     })

@@ -1,5 +1,5 @@
+import cacheManager from 'cache-manager'
 import express from 'express'
-import cacheManager from 'cache-manager';
 
 // The TypeScript definition for cache-manager does not export the Cache interface so we recreate it here
 export interface Cache {
@@ -16,7 +16,7 @@ export interface Options {
   catchErrors?: boolean
 }
 
-export function createDefaultCache(): Cache {
+export function createDefaultCache (): Cache {
   return cacheManager.caching({
     store: 'memory',
     ttl: 60 * 60 // 1 hour

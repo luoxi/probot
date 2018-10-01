@@ -1,15 +1,15 @@
 import Webhooks, { WebhookEvent } from '@octokit/webhooks'
 import Logger from 'bunyan'
 import express from 'express'
-import { Application } from './application'
 import { ActionApplication } from './action'
+import { Application } from './application'
+import { createDefaultCache } from './cache'
 import { Context } from './context'
 import { createApp } from './github-app'
 import { logger } from './logger'
 import { resolve } from './resolver'
 import { createServer } from './server'
 import { createWebhookProxy } from './webhook-proxy'
-import { createDefaultCache } from './cache'
 
 // tslint:disable:no-var-requires
 // These needs types

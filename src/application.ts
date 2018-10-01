@@ -2,11 +2,11 @@ import { WebhookEvent } from '@octokit/webhooks'
 import express from 'express'
 import { EventEmitter } from 'promise-events'
 import { ApplicationFunction } from '.'
+import { Cache, Options } from './cache'
 import { Context } from './context'
 import { GitHubAPI } from './github'
 import { logger } from './logger'
 import { LoggerWithTarget, wrapLogger } from './wrap-logger'
-import { Cache, Options } from './cache'
 
 // Some events can't get an authenticated client (#382):
 function isUnauthenticatedEvent (event: WebhookEvent) {
@@ -147,15 +147,6 @@ export class Application {
     }
   }
 
-  protected authenticateEvent (event: WebhookEvent, log: LoggerWithTarget): Promise<GitHubAPI> {
-    if (isUnauthenticatedEvent(event)) {
-      log.debug('`context.github` is unauthenticated. See https://probot.github.io/docs/github-api/#unauthenticated-events')
-      return this.auth()
-    }
-
-    return this.auth(event.payload.installation!.id, log)
-  }
-
   /**
    * Authenticate and get a GitHub client that can be used to make API calls.
    *
@@ -210,5 +201,14 @@ export class Application {
     }
 
     return github
+  }
+
+  protected authenticateEvent (event: WebhookEvent, log: LoggerWithTarget): Promise<GitHubAPI> {
+    if (isUnauthenticatedEvent(event)) {
+      log.debug('`context.github` is unauthenticated. See https://probot.github.io/docs/github-api/#unauthenticated-events')
+      return this.auth()
+    }
+
+    return this.auth(event.payload.installation!.id, log)
   }
 }
