@@ -3,6 +3,7 @@ import { createDefaultCache } from './cache'
 import { GitHubAPI } from './github'
 import { WebhookEvent } from '@octokit/webhooks';
 import { LoggerWithTarget } from './wrap-logger';
+import uuid from 'uuid'
 
 
 export class ActionApplication extends Application {
@@ -26,7 +27,7 @@ export class ActionApplication extends Application {
     this.load(require(appPath))
 
     const event = {
-      id: '1',
+      id: uuid.v4(),
       name: GITHUB_EVENT,
       payload
     }
