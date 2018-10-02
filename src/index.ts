@@ -1,7 +1,6 @@
 import Webhooks, { WebhookEvent } from '@octokit/webhooks'
 import Logger from 'bunyan'
 import express from 'express'
-import { ActionApplication } from './action'
 import { Application } from './application'
 import { createDefaultCache } from './cache'
 import { Context } from './context'
@@ -32,6 +31,7 @@ export class Probot {
   private options: Options
   private apps: Application[]
   private app: () => string
+  private githubToken?: string
 
   constructor (options: Options) {
     options.webhookPath = options.webhookPath || '/'
@@ -40,7 +40,14 @@ export class Probot {
     this.logger = logger
     this.apps = []
     this.webhook = new Webhooks({ path: options.webhookPath, secret: options.secret })
-    this.app = createApp({ id: options.id, cert: options.cert })
+    if (options.id && options.cert) {
+      this.app = createApp({ id: options.id, cert: options.cert })
+    } else if (options.githubToken) {
+      this.githubToken = options.githubToken
+      this.app = () => ''
+    } else {
+      throw new Error('You must provide either an id/cert combination or an access token')
+    }
     this.server = createServer({ webhook: this.webhook.middleware, logger })
 
     // Log all received webhooks
@@ -72,8 +79,7 @@ export class Probot {
     if (typeof appFn === 'string') {
       appFn = resolve(appFn) as ApplicationFunction
     }
-
-    const app = new Application({ app: this.app, cache, catchErrors: true })
+    const app = new Application({ app: this.app, cache, catchErrors: true, githubToken: this.githubToken })
 
     // Connect the router from the app to the server
     this.server.use(app.router)
@@ -118,10 +124,11 @@ export type ApplicationFunction = (app: Application) => void
 export interface Options {
   webhookPath?: string
   secret?: string,
-  id: number,
-  cert: string,
+  id?: number,
+  cert?: string,
+  githubToken?: string,
   webhookProxy?: string,
   port?: number
 }
 
-export { Logger, Context, Application, ActionApplication }
+export { Logger, Context, Application }

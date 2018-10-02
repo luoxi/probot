@@ -1,5 +1,4 @@
 import cacheManager from 'cache-manager'
-import express from 'express'
 
 // The TypeScript definition for cache-manager does not export the Cache interface so we recreate it here
 export interface Cache {
@@ -7,13 +6,6 @@ export interface Cache {
 }
 export interface CacheConfig {
   ttl: number
-}
-
-export interface Options {
-  app: () => string
-  cache: Cache
-  router?: express.Router
-  catchErrors?: boolean
 }
 
 export function createDefaultCache (): Cache {
