@@ -24,7 +24,7 @@ async function graphql (client: GitHubAPI, query: string, variables: Variables, 
   const res = await client.request({
     baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api`,
     headers: {
-      'accept': 'application/json',
+      'accept': 'application/vnd.github.antiope-preview+json',
       'content-type': 'application/json',
       ...headers
     },
